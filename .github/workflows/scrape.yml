@@ -1,0 +1,47 @@
+name: Update news
+
+on:
+  schedule:
+    # 06:17 UTC = 09:17 по Минску (UTC+3). GitHub может запускать с задержкой.
+    - cron: "17 6 * * *"
+  workflow_dispatch: # кнопка Run workflow
+
+permissions:
+  contents: write # только для коммита data/news.csv
+
+concurrency:
+  group: update-news
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Run scraper
+        run: python scraper.py
+
+      - name: Commit updated CSV
+        run: |
+          if git diff --quiet -- data/news.csv; then
+            echo "data/news.csv не изменился — коммит не нужен"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/news.csv
+          git commit -m "Обновление новостей: $(TZ=Europe/Minsk date '+%Y-%m-%d %H:%M')"
+          git push

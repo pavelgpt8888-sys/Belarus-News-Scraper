@@ -1,0 +1,26 @@
+# Виртуальное окружение и кеши Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Локальные HTML-страницы для анализа вёрстки
+html_samples/
+*.html
+
+# Временные файлы записи CSV
+data/*.tmp
+
+# Секреты и локальные настройки
+.env
+.env.*
+*.pem
+*.key
+
+# Системные файлы и IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.claude/
